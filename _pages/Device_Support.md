@@ -454,6 +454,7 @@ release](Download_Micro-Manager_Latest_Release).
     Stabilization from [BIG](http://big.umassmed.edu)
 -   [PriorPureFocus](PriorPureFocus) - Hardware autofocus device from Prior
 -   [PyDevice](PyDevice) (Experimental) - Devices controlled by Python scripts
+-   [ReflectorFocus](ReflectorFocus) - Hardware autofocus combining shutter, camera, and Z-stage
 -   [Rapp](Rapp) - Rapp UGA40 photobleaching/photoactivation
     unit
 -   [SimpleAutofocus](SimpleAutofocus) - Image-based
