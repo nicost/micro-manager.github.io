@@ -15,12 +15,16 @@ exposure.
 
 ![](/media/PTCTools.png)
 
-Provide even, continuous illumination of your camera. Establish the
-lowest exposure time possible with your camera, and establish the
+Provide even, continuous illumination of your camera. It may be helpful 
+to set an ROI in the center of the field of view so that illumination 
+is more homogenuous.  
+Establish thelowest exposure time possible with your camera, and establish the
 exposure time that just leads to saturation of your image (which will
 depend on illumination intensity). Decide how many exposures (i.e.,
 different exposure times) you would like to obtain, and how many frames
-per exposure.
+per exposure. The Spacing exponent parameter determines the spacing of
+exposure times.  A vlaue of 1.0 leads to a linear series, the default 0.5 
+should give you more higher exposures, which may help the analysis.
 
 The plugin will then ask you to close the shutter, or prevent light of
 reaching the sensor in any other way possible so that it can obtain a
@@ -35,19 +39,35 @@ light back on.
 
 After all images are collected (which may take a while), an ImageJ stack
 with two channels, one the mean, the other channel the std.dev. at each
-exposure, as well as a results table that lists the exposure time, the
-mean (calculated from the means of the n images taken at the given
-exposure) and the standard deviation at each exposure (calculated from
-the n means) will be shown. The standard deviation will be very low
-(&lt; 1) if you have a stable light source, higher values indicate
-significant fluctuations, which will make the results harder to
-interpret.
+exposure will be shown.  These images shoudl be especially informative 
+for sCMOS cameras, where the per pixel variation in noise can be very high.
 
-The resulting stack with means and std. dev. can be used to calculate
-per pixel camera characteristics. You can experiment with the Demo
-Camera. Set the Mode property to Noise, and use the Photon Conversion
-Factor, Photon Flux and Readnoise properties to change the illumination
-intensity and gain and readnoise of your virtual camera.
+Also show is an ImageJ Results tables.  This has the following columns:
+
+- Exposure: Exposure time used to acquire the Stacks of Images
+- Average mean Intensity of the images in the stack.
+- Noise: Average Std. Deviation of the images in the stack.
+- Read+Shot Noise: Each image in the stack was subtracted from the first
+image, then the Standard Deviation was calculated and divided by the Sqrt of 2.
+This procedure will subtract the Fixed Pattern Noise in the image, so only 
+Read Noise and Shot Noise is remaining.
+- Std. Dev.: Variation in mean intensity of the images.  If this number is 
+high, most likely the light source is fluctuating.
+- ADU Estimate: Mean Intenisty divided by variance.
+- Local Slope: When close to 0.5, this image is shot noise limited and the 
+ADU should be valid.
+
+![](/media/PTCResults.png)
+
+The plugin will also plot the data on a log log plot, fit a line and calculate
+the ADU (Photon Conversion Factor, electrons/DN), and express the read noise in electrond.
+
+![](/media/PTCCurve.png)
+
+You can experiment with the plugin with the Demo Camera.  To do so, set the "Mode" property to "Noise".  You can change the "Photon Flux" (the simulated brightness of the light source), to the highest value possible so that it does not 
+take too long to acquire data.  Set the ReadNoise (electrons) to 25, and run the plugin to get the results shown here (Minimum 0.001, Max 16ms, Nr. Exposures 16, Nr Frames 25, Spacing 0.5).
+
+
 
 {% include Listserv_Search text="Photon Transfer Curve Assistant" %}
 
