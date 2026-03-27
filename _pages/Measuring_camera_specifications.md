@@ -39,18 +39,25 @@ approximate the electron conversion factor at different gain settings
 and fixed pattern noise. Please compare the numbers you find with the
 numbers on the data-sheet of the camera!
 
-For these measurements, you will make extensive use of the Micro-Manager
-scripting facilities. Please have a look at the [Script Panel
-GUI](Script_Panel_GUI) (you will find it under the “Tools”
-menu)
 
 # Constant/Even Illumination
 
 To measure fixed pattern noise and the photon conversion factor, it is
 important to provide constant, even illumination. This is difficult to
 accomplish. One of the simplest ways is to use a smart phone with high
-resolution screen and display a white image (the flashlight application
-on the iPhone 4 works very well, other phones may work as well).
+resolution screen and display a white image (flashlight applications
+often have this capability). You can do this on a microscope by placing
+the phone flat on the microscope stage after switching to a low mag objective
+or removing the objective alltogether.  If you have a camera that is not 
+attached to a microsocpe, you can use a frosted disposable drinking cup
+(which is semi-transparent and scatters light a lot) over the entrance
+of the camera.  Make sure that you have a light source that does not 
+flicker at high frequencies (you can check this by collecting a time-lapse
+series at high frame rate / short exposure time and check for fluctuations in 
+intenisty).  
+
+The best method to provide even illumination is by using an 
+[intergrating sphere](https://en.wikipedia.org/wiki/Integrating_sphere).
 
 # Measuring Camera Characteristics
 
@@ -64,32 +71,39 @@ on the iPhone 4 works very well, other phones may work as well).
     window except for “Time points”, set the number of time points to
     100 and the interval to 0 and press ‘Acquire”.
 -   Inspect the resulting data for irregularities. Does the average
-    intensity stay constant (press control-A, in the ImageJ menu select
-    “Analyze”-&gt;”Tools”-&gt;”ROI manager”, in the ROI manager press
-    “Add”, then select “More” -&gt; “Multi Measure”, make sure “Measure
-    all Slices” and “One row per slice” are checked and press OK) ?
+    intensity stay constant:
+    - First make a copy of the data into ImageJ
+    by clicking the Gear icon and selecting "To ImageJ..." 
+    - Press control-A, in the ImageJ menu
+    - Select “Analyze”-&gt;”Tools”-&gt;”ROI manager” 
+    - In the ROI manager press “Add”, then select “More” -&gt; “Multi Measure”
+    - Make sure “Measure all Slices” and “One row per slice” are checked and press OK)
+    - To plot the data, copy the results table into a spreadsheet application.
 -   Calculate the sum using the ImageJ menu command ‘Image -&gt; Stacks
     -&gt; Z project...’. Choose the option ‘Sum of Slices’
 -   Inspect the resulting summed image for fixed patterns (look at the
     side, look for regular patterns).
--   Repeat steps above using other readout speeds (if available on your
+-   Repeat steps above using other readout speeds and/or gain (if available on your
     camera).
 
 ## Visual inspection for fixed pattern noise in bright images
 
--   Use a smartphone as illumination source (see introduction). Remove
+-   Use a smartphone (or preferably an integrating sphere) as 
+    illumination source (see introduction). Remove
     an objective from the microscope and place the phone on the
     microscope (it may even fit in the sample holder on the stage).
     Place it such that the image is as evenly illuminated as possible.
     Find an exposure time such that the maximum pixel value is about 90%
     of the highest value of the camera (you can use the Micro-Manager
     AutoExposure script for this purpose).
--   Repeat steps 1b-1f. You will note many imperfections in the output
+-   Repeat steps listed above for dark images. You may note imperfections 
+    in the output
     image. Some imperfections are caused by uneven illumination and dust
-    in the microscope of on the camera front window, the remainder is
+    in the microscope or on the camera front window, the remainder is
     caused by fixed pattern noise in the camera. You can discriminate
     imperfections in your microscope from camera imperfections by
-    rotating the camera 90 degrees and taking another data set. Patterns
+    rotating the camera 90 degrees and taking another data set (or rotate
+    the camera while looking at a live image feed). Patterns
     that stay the same are caused by the camera, patterns that rotate 90
     degrees are caused by your microscope.
 
@@ -102,11 +116,13 @@ Negative values have no physical meaning and are hard to work with in a
 computer, therefore the camera manufacturers introduce an ‘offset’ (or,
 if they don’t, they should!) that sometimes can be changed by the end
 user. However, since you want to relate the digital numbers coming from
-your camera to a physical entity (the number of photons hitting a
+your camera to a physical entity (the number of photons absorbed by a
 pixel), you will need to know what this offset is. Since the variation
 in pixel intensities of a ‘dark’ image is caused by readout noise, you
 can simply calculate the readout noise by calculating the standard
-deviation of the pixel intensity values in such a dark image.
+deviation of the pixel intensity values in such a dark image. For a CMOS
+camera, the read-noise can differ from pixel to pixel, and it is better to 
+acquire a stack of dark images and calculate the standard deviation per pixel.
 
 -   To measure the offset, take a single ‘dark’ image from the series
     described in 1 (or take a new one). Calculate the average intensity
@@ -131,14 +147,27 @@ deviation of the pixel intensity values in such a dark image.
 ## Estimate the electron conversion factor (electrons per digital number).
 
 Theory: If a signal only contains Poisson (shot) noise, then:
-<span>σ(N)=√(N)</span> with N = number of electrons. A camera generates
-images expressed in digital numbers (DN) instead of electrons. The
-relation between digital numbers and electrons is given by: N=c . DN
-Where c is the constant that we are interested in (the electron
-conversion factor). The following equation also holds true: σ(N)=c .
-σ(DN) Substituting the last two equations in the first and solving for
-‘c’ yields: c = DN/σ2(DN) Thus, if imaging conditions can be established
-in which the only significant noise source is shot noise, then the
+
+<p style="text-align: center;"><span>σ(N)=√(N)</span> with N = number of electrons</P>
+
+A camera generates images expressed in digital numbers (DN, sometimes 
+called ADU: Analog-to-Digital Units) instead of electrons. The relation 
+between digital numbers and electrons is given by:
+
+<p style="text-align: center;"><span>N = c * DN</span></p>
+
+where c is the constant that we are interested in (the electron
+conversion factor). The following equation also holds true:
+
+<p style="text-align: center;"><span>σ(N)=c . σ(DN)</span></p>
+
+Substituting the last two equations in the first and solving for
+‘c’ yields:
+
+<p style="text-align: center;"><span>c = DN/σ2(DN)</span></p>
+
+Thus, if imaging conditions can be established in which the only 
+significant noise source is shot noise, then the
 relation between digital number and number of electrons can be
 determined without a need to know the absolute number of electrons
 striking the CCD!
