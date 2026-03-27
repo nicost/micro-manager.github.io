@@ -196,58 +196,35 @@ To facilitate measuring the photon conversion factor, we will remove
 fixed pattern noise by taking two images at each exposure time and
 calculate the noise after subtracting one image from the other.
 
--   To create a Photon Transfer Curve we will take a series of images,
-    using the Micro-Manager script
-    ‘[CameraLabs.bsh](https://github.com/micro-manager/micro-manager/tree/main/scripts/CameraLabs/CameraLabs.bsh)’.
-    This script takes images at increasing exposure times (two images at
-    each exposure time). We will then use the Micro-Manager script
-    [CameraAnalysis.bsh](https://github.com/micro-manager/micro-manager/tree/main/scripts/CameraLabs/CameraAnalysis.bsh)
-    to calculate the mean and standard deviation for each of these
-    images. The script will calculate the mean intensity from one image
-    and calculate the standard deviation by subtracting one of the two
-    images from the other to remove fixed pattern noise. The collected
-    data will be plotted on a log-log scale, yielding the Photon
-    Transfer Curve.
--   In Micro-Manager, open the Script Panel (Tools-&gt;Script Panel).
-    Press the ‘Add’ button in the upper left corner and locate the file
-    ‘CameraLabs.bsh’ in `C:\Program Files\Micro-Manager-2.0\scripts\CameraLabs`.
-    Likewise, “add” the scripts: “plotData.bsh”, “CameraAnalysis.bsh”, and
-    “FPN.bsh”. Run the script “plotData.bsh” (you will see no output, it
-    simply loads the plotting code, you need to run this only once).
-    -   Use a smartphone display for even illumination as described
-        above. Determine the maximum exposure time at which the image
-        has not yet saturated pixels. Select the “CameraLabs” script and
-        enter the measured time as the ‘finalExposure’ variable in the
-        script. Set ‘nrExposures’ to 50. Run the script. Inspect the
-        resulting data. Pixels values will initially be dim and finally
-        should be close to saturation.
-    -   (Optional). To get accurate measurements one should correct for
-        the offset (measured above). To do so, select the just acquired
-        data set, from the ImageJ menu, choose “Image”-&gt;”Duplicate”,
-        and duplicate the whole stack. From the ImageJ menu choose
-        “Process”-&gt;”Math”-&gt;”Subtract” and enter the offset you
-        measured previously. Process all slices.
-    -   While this data window is selected, run the script
-        “CameraAnalysis.bsh”. The script will generate the “Photon
-        Transfer Curve”. Inspect the Photon Transfer Curve (you can zoom
-        in by drawing a box in a region of the plot, zoom out by right
-        clicking the mouse). Note the region at low intensities where
-        the slope of the curve is close to 0 (read-noise limited). Find
-        the area of the curve where the slope is 0.5. To help you do so,
-        the script outputs the slope at each data point in a table. The
-        Photon Conversion Factor is calculated for you in the same table
-        by dividing the signal by the square of the noise.
-    -   If your Photon Transfer Curve did not bulge downwards at high
-        intensities, increase the maximum exposure time by \~5% and
-        repeat the procedure. The intensity at which the Photon Transfer
-        Curve peaks is the full-well capacity.
-    -   Determine the most appropriate Photon Conversion Factor. Express
-        the readout-noise in terms of electrons. Express the full-well
-        capacity in terms of electrons. Compare your measurements with
-        the data sheet for the camera.
-    -   Repeat these measurements at other settings of the camera.
-        Changes in the analog gain and readout speed will affect these
-        numbers. You can also look at the effect of EM gain and binning.
+-   To create a Photon Transfer Curve and estimate the photon conversion
+    factor and read-noise in electrons, we will use the Micro-Manager
+    plugin "Photon Transfer Curve assistant" (Plugins > Acquisition Tools).
+    This plugin fully automates taking stacks of images at increasing 
+    exposure times, calculating mean and standard deviation, plotting 
+    the data and calculating the electron conversion factor and read-noise.
+-   Provide uniform and constant illumination to the camera, then establish
+    the maximum exposure time where you just start to see clipping of 
+    pixel intensities.
+
+
+![](/media/PTCTools.png)
+
+-   Follow the instructions, you will end up with a plot with the Photon
+    transfer curve, a table with the mean and standard deviation of each 
+    of the stacks, and a stack of images with the mean and standard 
+    deviation of each exposure.  Inspect the latter for interesting 
+    patterns (which you may be able to see with CMOS cameras).  Also
+    take note of the highest value in the Photon Transfer Curve.  Express
+    that number in electrons, divide by the read-noise, and you have a 
+    measure for the dynamic range at these camera settings.  You can 
+    also plot the exposure time against the mean to get an idea of the 
+    linearity of the camera response.
+    
+-   Now change the gain (or EM gain if you have an EM CCD), and run the 
+    plugin again.  This will change the electron conversion factor and
+    possibly the read-noise.
+
+
 
 # References
 
