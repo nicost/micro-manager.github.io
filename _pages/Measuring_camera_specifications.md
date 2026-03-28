@@ -12,7 +12,8 @@ read-noise and offset using Photon Transfer Curves**
 
 --[Nico](/users/Nico) 12:23, 30 September 2011 (PDT)
 
-Based on a handout for the Bangalore Microscopy Course, 2011
+Based on a handout for the Bangalore Microscopy Course, 2011, modified 
+for UCSF course BP210 March 2026.
 
 # Introduction
 
