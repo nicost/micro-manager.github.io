@@ -56,7 +56,7 @@ Every instruction must be associated with a time interval.
 Two forms are supported:
 
 ```
-From frame 0 to frame 119:
+From frame 1 to frame 120:
 - action one
 - action two
 
@@ -96,7 +96,7 @@ across the full interval is `<degrees>`. For example, to spin the volume
 one full turn over 120 frames:
 
 ```
-From frame 0 to frame 119:
+From frame 1 to frame 120:
 - rotate by 360 degrees horizontally
 ```
 
@@ -133,7 +133,7 @@ Also supported for axes `y` and `z`. Values are in the range −1 to 1.
 
 #### Channel intensity
 
-Channels are numbered from 0.
+Channels are numbered from 1 (matching the Micro-Manager UI).
 
 ```
 change channel <c> min intensity to <value>
@@ -171,6 +171,53 @@ change channel <c> visibility to off
 
 Also accepts `true`/`false` and `show`/`hide` in place of `on`/`off`.
 
+#### Time point
+
+```
+change time to <n>
+change time from <a> to <n>
+```
+
+Moves to time point `<n>` (1-based, matching the Micro-Manager UI). This
+action is intended for time-lapse datasets and lets you animate through the
+T axis of a multi-time-point acquisition.
+
+In a `From frame A to frame B` block the time point is linearly interpolated
+and **rounded to the nearest integer** each frame, so it steps discretely
+through the dataset. Easing keywords apply and control the stepping rate
+(e.g. `ease-in-out` dwells longer at the beginning and end of the sweep).
+
+With the `to <n>` form, interpolation starts from the time point currently
+displayed in the viewer when the animation begins. With the `from <a> to <n>`
+form, interpolation always starts at `<a>` regardless of the viewer state.
+
+In an `At frame N` block the time point jumps immediately to `<n>`.
+
+Example — sweep through 10 time points while rotating the volume:
+
+```
+From frame 1 to frame 120:
+- rotate by 360 degrees horizontally
+- change time from 1 to 10
+```
+
+If **Restore viewer state after animation** is checked, the viewer returns
+to the time point it was showing before the animation started.
+
+A script function can also supply the time point dynamically. For example,
+to hold each time point for 12 frames before stepping to the next:
+
+```
+From frame 1 to frame 120:
+- change time to timeFn
+
+script
+function timeFn(t) {
+    // Steps through time points 1–10, holding each for 12 frames.
+    return floor((t - 1) / 12) + 1;
+}
+```
+
 ### Easing
 
 Any action line may end with an easing keyword that controls the speed
@@ -187,7 +234,7 @@ curve of the interpolation:
 Example:
 
 ```
-From frame 0 to frame 119:
+From frame 1 to frame 120:
 - rotate by 360 degrees horizontally ease-in-out
 ```
 
@@ -196,26 +243,26 @@ From frame 0 to frame 119:
 An optional `script` block at the end of the script text may define
 JavaScript functions. Any numeric parameter in an action line can be
 replaced by the function's name; the function is called with the current
-frame number as its argument and its return value is used as the parameter
-for that frame.
+1-based frame number as its argument and its return value is used as the
+parameter for that frame.
 
 Available math shims (matching ImageJ macro syntax): `sin`, `cos`, `tan`,
 `asin`, `acos`, `atan`, `atan2`, `sqrt`, `exp`, `log`, `abs`, `floor`,
 `ceil`, `round`, `pow`, `min`, `max`, `PI`, `E`.
 
 ```
-From frame 0 to frame 119:
+From frame 1 to frame 120:
 - rotate by 360 degrees horizontally ease-in-out
 - zoom by a factor of zoomFn
 
 script
 function zoomFn(t) {
     // Returns a per-frame zoom delta.
-    // Absolute position = 0.1 + 2.9 * sin(PI * t / 119)
-    // ranges from 0.1 at t=0, peaks at 3.0 near t=60, returns to 0.1 at t=119.
+    // Absolute position = 0.1 + 2.9 * sin(PI * (t-1) / 119)
+    // ranges from 0.1 at t=1, peaks at 3.0 near t=60, returns to 0.1 at t=120.
     // The delta is the derivative of that curve.
-    var pos  = 0.1 + 2.9 * sin(PI * t / 119);
-    var prev = 0.1 + 2.9 * sin(PI * (t - 1) / 119);
+    var pos  = 0.1 + 2.9 * sin(PI * (t - 1) / 119);
+    var prev = 0.1 + 2.9 * sin(PI * (t - 2) / 119);
     return pos - prev;
 }
 ```
@@ -233,24 +280,24 @@ value directly. Because `zoom by a factor of` accumulates a delta each frame,
 # Rotate 360° while pulsing zoom (0.1x → 3.0x → 0.1x) and gradually
 # revealing the volume by opening the front clip.
 
-From frame 0 to frame 119:
+From frame 1 to frame 120:
 - rotate by 360 degrees horizontally ease-in-out
 - zoom by a factor of zoomFn
 
-From frame 0 to frame 60:
+From frame 1 to frame 60:
 - change front clipping to -0.5
 
-From frame 61 to frame 119:
-- change channel 0 max intensity to 0.9 ease-out
+From frame 61 to frame 120:
+- change channel 1 max intensity to 0.9 ease-out
 
 At frame 60:
-- change channel 1 visibility to on
+- change channel 2 visibility to on
 
 script
 function zoomFn(t) {
-    // Smooth arc: 0.1 at t=0, peaks at 3.0 near t=60, returns to 0.1 at t=119.
-    var pos  = 0.1 + 2.9 * sin(PI * t / 119);
-    var prev = 0.1 + 2.9 * sin(PI * (t - 1) / 119);
+    // Smooth arc: 0.1 at t=1, peaks at 3.0 near t=60, returns to 0.1 at t=120.
+    var pos  = 0.1 + 2.9 * sin(PI * (t - 1) / 119);
+    var prev = 0.1 + 2.9 * sin(PI * (t - 2) / 119);
     return pos - prev;
 }
 ```
