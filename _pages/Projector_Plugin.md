@@ -85,10 +85,46 @@ The calibration should be independent of the objective used, but will
 change when using different cameras. Currently there is no way to store
 different calibration mappings, e.g. for two different objectives.
 
+### Calibration options
+
+-   **Points**: the size of the calibration lattice, from 2 x 2 to
+    8 x 8 (default). Fewer points calibrate faster, but correct less
+    for distortions of the projected image.
+-   **Sub-pixel spot detection (centroid)**: locates each calibration
+    spot using a background-subtracted centroid, rather than the
+    maximum of a heavily blurred image, giving sub-pixel precision.
+-   **Smoothing**: compares each measured calibration spot with its
+    neighbors (Gaussian width in lattice spacings: Off, 0.5, 1.0, 1.5
+    or 2.0) and ignores spots that disagree with them (outliers). Since the
+    raw spot positions are stored with the calibration, changing this
+    setting rebuilds the current calibration without re-measuring
+    (calibrations made with older versions need to be redone first).
+
+### Checking the calibration
+
+![](/media/ProjectorCalibrationCheck.png)
+
+The Check button tests the current calibration by projecting spots
+in between the calibration points (at the center of each calibration
+cell, or on a finer grid within each cell when there are few cells),
+and measuring where they land on the camera. Press the button again (it reads "Stop" while running) to
+abort. The resulting report lists, for each spot, the target and
+measured positions, as well as the mean, RMS, median and maximum
+distance between them (in pixels, and in microns when the pixel size is
+known). The report also shows the mean offset, i.e. the systematic
+shift between targets and measured spots. Use "Set offset" to correct
+the calibration for this shift (and run Check again to verify), or
+"Unset offset" to remove such a correction. The report can be saved as
+a text file with "Save...".
+
 | Setting                | Description                                                                                                                                                                                                                                                                                                        |
 |------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Show center spot       | Illuminate center of SLM or galvo device.                                                                                                                                                                                                                                                                          |
 | Calibrate              | Creates calibration map of photo-targeting device range to the camera pixel position.                                                                                                                                                                                                                              |
+| Check                  | Projects spots between the calibration points and reports how far they land from their targets. See [Checking the calibration](#checking-the-calibration).                                                                                                                                                   |
+| Points                 | Number of calibration points (2 x 2 to 8 x 8).                                                                                                                                                                                                                                                                    |
+| Sub-pixel spot detection (centroid) | Locate calibration spots with a background-subtracted centroid instead of the maximum of a blurred image.                                                                                                                                                                                             |
+| Smoothing              | Fit each calibration spot to its neighbors and ignore outliers. Off uses spots as measured.                                                                                                                                                                                                                      |
 | Delay(ms)              | Use to synchronize photo-targeting exposure with camera exposure                                                                                                                                                                                                                                                   |
 | Phototargeting Shutter | Shutter to be opened for photo-targeting. Not all photo-targeting devices need this to be set, for instance the Rapp UGA-40 controls the light source directly.                                                                                                                                                    |
 | Phototargeting channel | Toggles to specified channel during phototargeting. You don't need to set this unless some hardware needs to be moved during imaging, like a dichroic and/or a shutter. If you don't see your channel listed, you must set the `Core-ChannelGroup` in the `Property Browser` to the Group containing this channel. |
